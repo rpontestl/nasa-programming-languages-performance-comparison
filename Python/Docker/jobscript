@@ -1,0 +1,148 @@
+#!/bin/csh -f
+
+#SBATCH --time=05:50:00
+#SBATCH --job-name=numpy
+#SBATCH --ntasks=40
+#SBATCH --constraint=sky
+#SBATCH -A j1008
+#SBATCH --mail-type=BEGIN
+#SBATCH --mail-type=END
+#SBATCH -o Python2021-%j.out
+
+
+#######################################################################
+#                  System Environment Variables
+#######################################################################
+
+umask 022
+
+#limit
+
+source /usr/share/modules/init/csh
+module purge
+
+module load python/GEOSpyD/Min4.9.2_py3.9
+#module load python/GEOSpyD/Ana2019.10_py3.7
+start=$(date +%s%N)
+
+echo '-------------------------'
+echo 'Setting ouput file'
+touch results-docker-python.csv
+python3 create_file_header.py docker
+
+echo 'All set!'
+echo '-------------------------'
+
+
+echo '-------------------------'
+echo 'Copy Matrix'
+echo '-------------------------'
+python3 test_copy_matrix.py 5000 docker
+python3 test_copy_matrix.py 7000 docker
+python3 test_copy_matrix.py 9000 docker
+
+echo '-------------------------'
+echo 'Look and say sequence'
+echo '-------------------------'
+python3 test_look_and_say.py 40 docker
+python3 test_look_and_say.py 45 docker
+python3 test_look_and_say.py 48 docker
+
+echo '-------------------------'
+echo 'Count Unique Words in File'
+echo '-------------------------'
+python3 test_count_unique_words.py ./Data/bible.txt docker
+python3 test_count_unique_words.py ./Data/book1.txt docker
+python3 test_count_unique_words.py ./Data/plrabn12.txt docker
+python3 test_count_unique_words.py ./Data/world192.txt docker
+
+echo '-------------------------'
+echo 'Fibonacci Sequence'
+echo '-------------------------'
+python3 test_fibonacci.py 25 docker
+python3 test_fibonacci.py 35 docker
+python3 test_fibonacci.py 45 docker
+
+echo '-------------------------'
+echo 'Matrix Multiplication'
+echo '-------------------------'
+python3 test_matrix_multiplication.py 1500 docker
+python3 test_matrix_multiplication.py 1750 docker
+python3 test_matrix_multiplication.py 2000 docker
+
+echo '-------------------------'
+echo 'Belief Propagation'
+echo '-------------------------'
+python3 test_belief_propagation.py 250 docker
+python3 test_belief_propagation.py 500 docker
+python3 test_belief_propagation.py 1000 docker
+
+echo '-------------------------'
+echo 'Markov Chain'
+echo '-------------------------'
+python3 test_markov_chain.py 5000 docker
+python3 test_markov_chain.py 10000 docker
+python3 test_markov_chain.py 15000 docker
+
+echo '-------------------------'
+echo 'Compute FFT'
+echo '-------------------------'
+python3 test_compute_FFT.py 1000 docker
+python3 test_compute_FFT.py 3000 docker
+python3 test_compute_FFT.py 5000 docker
+
+echo '-------------------------'
+echo 'Jacobi Iterative solver'
+echo '-------------------------'
+python3 test_laplace_jacobi_4.py 100 docker
+python3 test_laplace_jacobi_4.py 150 docker
+python3 test_laplace_jacobi_4.py 200 docker
+
+echo '-------------------------'
+echo 'Compute square root of a matrix'
+echo '-------------------------'
+python3 test_sqrt_matrix.py 1000 docker
+python3 test_sqrt_matrix.py 2000 docker
+python3 test_sqrt_matrix.py 4000 docker
+
+echo 'Gauss Legendre quadrature'
+echo '-------------------------'
+python3 test_gauss_legendre_quadrature.py 50 docker
+python3 test_gauss_legendre_quadrature.py 75 docker
+python3 test_gauss_legendre_quadrature.py 100 docker
+
+echo '-------------------------'
+echo 'Evaluation of functions'
+echo '-------------------------'
+python3 test_evaluate_functions.py  80000 docker
+python3 test_evaluate_functions.py  90000 docker
+python3 test_evaluate_functions.py 100000 docker
+
+echo '-------------------------'
+echo 'Compute Munchausen Numbers'
+echo '-------------------------'
+python3 test_munchausen_number.py 0 docker
+
+echo '-------------------------'
+echo 'Compute Pernicious Numbers'
+echo '-------------------------'
+python3 test_pernicious_numbers.py 100000 docker
+
+echo '-------------------------'
+echo 'Processing a collection of files'
+echo '-------------------------'
+python3 ./Data/create_nc4Files.py
+
+python3 test_time_series_AOA.py 0 docker
+end=$(date +%s%N)
+echo "Elapsed Time $(($(($end-$start))/1000000)) ms"
+python3 writeTime.py "${start}" "${end}"
+#time python test_time_series_AOA_multiproc.py 1
+#time python test_time_series_AOA_multiproc.py 2
+#time python test_time_series_AOA_multiproc.py 4
+#time python test_time_series_AOA_multiproc.py 8
+#time python test_time_series_AOA_multiproc.py 16
+#time python test_time_series_AOA_multiproc.py 24
+##time python test_time_series_AOA_multiproc.py 28
+
+
